@@ -7,7 +7,7 @@ import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 
 // Disable Edge runtime for auth routes
-//export const runtime = 'nodejs'
+export const runtime = 'nodejs'
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
     adapter: PrismaAdapter(prisma),
