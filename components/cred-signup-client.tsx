@@ -68,9 +68,9 @@ export default function ClientCredentialsSignUp() {
     };
 
     return (
-        <div className="mx-auto">
+        <div>
             {error && (
-                <div className="p-3 text-sm text-red-500 bg-red-50 rounded-lg border border-red-200">
+                <div className="p-3 mb-4 text-sm text-red-500 bg-red-50 rounded-lg border border-red-200">
                     {error}
                 </div>
             )}
@@ -130,7 +130,7 @@ export default function ClientCredentialsSignUp() {
                 <button
                     disabled={loading}
                     type="submit"
-                    className="w-full rounded-lg bg-gray-800 px-6 py-2 text-sm font-medium text-white shadow-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300"
+                    className="w-full rounded-lg bg-gray-800 px-6 py-2 text-sm font-medium text-white shadow-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:opacity-70"
                 >
                     {loading ? "Processing..." : "Sign up"}
                 </button>
