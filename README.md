@@ -69,3 +69,12 @@ npx prisma studio
 ```
 
 This command launches Prisma Studio, a visual database management interface for your Prisma database. It provides a GUI where you can view, filter, and edit your database records without writing SQL queries. Prisma Studio automatically understands your schema and displays your data in a user-friendly interface, making it an essential tool for development and debugging.
+
+## Add Password Field
+
+```shell
+npx prisma migrate dev --name add_password_field
+```
+
+This command creates and applies database migrations based on changes to your Prisma schema. It generates SQL migration files, updates your database structure, and records the migration in your project history. The `--name add_password_field` parameter labels this migration for tracking purposes.
+

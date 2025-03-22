@@ -4,9 +4,10 @@ import { prisma } from "@/prisma/prisma"
 import GitHub from "next-auth/providers/github"
 import Google from "next-auth/providers/google"
 import Credentials from "next-auth/providers/credentials";
+import bcrypt from "bcryptjs";
 
 // Disable Edge runtime for auth routes
-export const runtime = 'nodejs'
+//export const runtime = 'nodejs'
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
     adapter: PrismaAdapter(prisma),
@@ -22,22 +23,38 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 password: {},
             },
             authorize: async (credentials) => {
-                const password = credentials?.password
-                const email = credentials?.email
+                const password = credentials?.password as string
+                const email = credentials?.email as string
                 let user = null
 
-                //warning: password must be "hashed" in real projects,this is only for demo purposes 
-                if (email === "aurore@domain.com" && password === "12345678") {
-                    user = {
-                        id: "1",
-                        name: "Aurore Davis",
-                        email: "aurore@domain.com",
+                if (!email || !password) {
+                    throw new Error("Email and password are required.")
+                }
+
+                // Check for registered users in the database
+                try {
+                    const dbUser = await prisma.user.findUnique({
+                        where: { email },
+                    })
+
+                    // Check if user exists and has a password field
+                    if (dbUser && 'password' in dbUser && dbUser.password) {
+                        // Verify the password using bcrypt
+                        const passwordMatch = await bcrypt.compare(password, dbUser.password as string);
+                        
+                        if (passwordMatch) {
+                            user = {
+                                id: dbUser.id,
+                                name: dbUser.name,
+                                email: dbUser.email,
+                            }
+                        }
                     }
+                } catch (error) {
+                    console.error("Error finding user:", error)
                 }
 
                 if (!user) {
-                    // No user found, so this is their first attempt to login
-                    // Optionally, this is also the place you could do a user registration
                     throw new Error("Invalid credentials.")
                 }
 
@@ -53,8 +70,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 token.id = user.id;
             }
             return token;
-        },*/
-        /*async session({ session, token }) {
+        },
+        async session({ session, token }) {
             // Send properties to the client
             if (session.user) {
                 session.user.id = token.id as string;
@@ -77,7 +94,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                     if (existingUser) {
                         // Check if this provider is already linked
                         const existingAccount = existingUser.accounts.find(
-                            (acc: any) => acc.provider === account.provider
+                            (acc: { provider: string }) => acc.provider === account.provider
                         );
                         
                         // If already linked, proceed with sign-in
