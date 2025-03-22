@@ -114,7 +114,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                                     token_type: account.token_type ?? null,
                                     scope: account.scope ?? null,
                                     id_token: account.id_token ? String(account.id_token) : null,
-                                    session_state: account.session_state ?? null
+                                    session_state: account.session_state ? String(account.session_state) : null
                                 },
                             });
                             return true;
