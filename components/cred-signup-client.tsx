@@ -1,39 +1,47 @@
 "use client"
-import { useState, ChangeEvent } from 'react';
+import { useState } from 'react';
 import { signIn } from 'next-auth/react';
-import { useRouter } from "next/navigation"
+import { useRouter } from "next/navigation";
 import { registerUser } from '@/app/actions/auth';
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+
+// Define the form schema with Zod
+const formSchema = z.object({
+  name: z.string().min(2, 'Name must be at least 2 characters'),
+  email: z.string().email('Please enter a valid email address'),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
+  confirmPassword: z.string()
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"],
+});
+
+// Type for our form data based on the schema
+type FormData = z.infer<typeof formSchema>;
 
 export default function ClientCredentialsSignUp() {
-    const router = useRouter()
+    const router = useRouter();
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
-    const [data, setData] = useState({ 
-        name: '', 
-        email: '', 
-        password: '', 
-        confirmPassword: '' 
+    
+    // Initialize React Hook Form with Zod resolver
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm<FormData>({
+        resolver: zodResolver(formSchema),
+        defaultValues: {
+            name: '',
+            email: '',
+            password: '',
+            confirmPassword: '',
+        },
     });
 
-    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setData(prevData => ({ ...prevData, [name]: value }));
-    };
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        
-        // Validate form data
-        if (data.password !== data.confirmPassword) {
-            setError("Passwords do not match");
-            return;
-        }
-        
-        if (data.password.length < 8) {
-            setError("Password must be at least 8 characters long");
-            return;
-        }
-
+    const onSubmit = async (data: FormData) => {
         setError(null);
         setLoading(true);
         
@@ -74,19 +82,20 @@ export default function ClientCredentialsSignUp() {
                     {error}
                 </div>
             )}
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                         Name
                     </label>
                     <input
                         type="text"
-                        name="name"
-                        value={data.name}
-                        onChange={handleChange}
-                        required
-                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-300"
+                        placeholder="Enter your full name"
+                        {...register('name')}
+                        className={`w-full rounded-lg border ${errors.name ? 'border-red-300' : 'border-gray-300'} px-4 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 ${errors.name ? 'focus:ring-red-300' : 'focus:ring-gray-300'}`}
                     />
+                    {errors.name && (
+                        <p className="mt-1 text-sm text-red-500">{errors.name.message}</p>
+                    )}
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -94,12 +103,13 @@ export default function ClientCredentialsSignUp() {
                     </label>
                     <input
                         type="email"
-                        name="email"
-                        value={data.email}
-                        onChange={handleChange}
-                        required
-                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-300"
+                        placeholder="Enter your email address"
+                        {...register('email')}
+                        className={`w-full rounded-lg border ${errors.email ? 'border-red-300' : 'border-gray-300'} px-4 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 ${errors.email ? 'focus:ring-red-300' : 'focus:ring-gray-300'}`}
                     />
+                    {errors.email && (
+                        <p className="mt-1 text-sm text-red-500">{errors.email.message}</p>
+                    )}
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -107,12 +117,13 @@ export default function ClientCredentialsSignUp() {
                     </label>
                     <input
                         type="password"
-                        name="password"
-                        value={data.password}
-                        onChange={handleChange}
-                        required
-                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-300"
+                        placeholder="Create a password (min. 8 characters)"
+                        {...register('password')}
+                        className={`w-full rounded-lg border ${errors.password ? 'border-red-300' : 'border-gray-300'} px-4 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 ${errors.password ? 'focus:ring-red-300' : 'focus:ring-gray-300'}`}
                     />
+                    {errors.password && (
+                        <p className="mt-1 text-sm text-red-500">{errors.password.message}</p>
+                    )}
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -120,12 +131,13 @@ export default function ClientCredentialsSignUp() {
                     </label>
                     <input
                         type="password"
-                        name="confirmPassword"
-                        value={data.confirmPassword}
-                        onChange={handleChange}
-                        required
-                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-300"
+                        placeholder="Confirm your password"
+                        {...register('confirmPassword')}
+                        className={`w-full rounded-lg border ${errors.confirmPassword ? 'border-red-300' : 'border-gray-300'} px-4 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 ${errors.confirmPassword ? 'focus:ring-red-300' : 'focus:ring-gray-300'}`}
                     />
+                    {errors.confirmPassword && (
+                        <p className="mt-1 text-sm text-red-500">{errors.confirmPassword.message}</p>
+                    )}
                 </div>
                 <button
                     disabled={loading}

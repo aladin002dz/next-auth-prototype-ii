@@ -1,22 +1,42 @@
 "use client"
-import { useState, ChangeEvent } from 'react';
+import { useState } from 'react';
 import { signIn } from 'next-auth/react';
-import { useRouter } from "next/navigation"
+import { useRouter } from "next/navigation";
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+
+// Define the form schema with Zod
+const formSchema = z.object({
+  email: z.string().email('Please enter a valid email address'),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
+});
+
+// Type for our form data based on the schema
+type FormData = z.infer<typeof formSchema>;
 
 export default function ClientCredentialsSignIn() {
-    const router = useRouter()
+    const router = useRouter();
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
-    const [data, setData] = useState({ email: 'aurore@domain.com', password: '12345678' });
-    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setData(prevData => ({ ...prevData, [name]: value }));
-    };
+    
+    // Initialize React Hook Form with Zod resolver
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm<FormData>({
+        resolver: zodResolver(formSchema),
+        defaultValues: {
+            email: '',
+            password: '',
+        },
+    });
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const onSubmit = async (data: FormData) => {
         setError(null);
         setLoading(true);
+        
         try {
             const result = await signIn("credentials", {
                 email: data.email,
@@ -24,6 +44,7 @@ export default function ClientCredentialsSignIn() {
                 redirect: false,
                 //redirectTo: "/dashboard"
             });
+            
             if (result?.error) {
                 if (result.error === "Configuration")
                     setError("Invalid credentials");
@@ -31,14 +52,15 @@ export default function ClientCredentialsSignIn() {
                     setError(result.error);
             }
             else {
-                router.push("/dashboard")
-                router.refresh()
-                return
+                router.push("/dashboard");
+                router.refresh();
+                return;
             }
         } catch (error) {
             console.error("An unexpected error occurred:", error);
             setError('An unexpected error occurred');
         }
+        
         setLoading(false);
     };
 
@@ -49,19 +71,20 @@ export default function ClientCredentialsSignIn() {
                     {error}
                 </div>
             )}
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                         Email
                     </label>
                     <input
                         type="email"
-                        name="email"
-                        value={data.email}
-                        onChange={handleChange}
-                        required
-                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
+                        placeholder="Enter your email address"
+                        {...register('email')}
+                        className={`w-full rounded-lg border ${errors.email ? 'border-red-300' : 'border-gray-300'} px-4 py-2 text-sm focus:outline-none focus:ring-2 ${errors.email ? 'focus:ring-red-300' : 'focus:ring-gray-300'}`}
                     />
+                    {errors.email && (
+                        <p className="mt-1 text-sm text-red-500">{errors.email.message}</p>
+                    )}
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -69,12 +92,13 @@ export default function ClientCredentialsSignIn() {
                     </label>
                     <input
                         type="password"
-                        name="password"
-                        value={data.password}
-                        onChange={handleChange}
-                        required
-                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
+                        placeholder="Enter your password"
+                        {...register('password')}
+                        className={`w-full rounded-lg border ${errors.password ? 'border-red-300' : 'border-gray-300'} px-4 py-2 text-sm focus:outline-none focus:ring-2 ${errors.password ? 'focus:ring-red-300' : 'focus:ring-gray-300'}`}
                     />
+                    {errors.password && (
+                        <p className="mt-1 text-sm text-red-500">{errors.password.message}</p>
+                    )}
                 </div>
                 <button
                     disabled={loading}

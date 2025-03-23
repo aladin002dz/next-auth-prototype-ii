@@ -78,3 +78,13 @@ npx prisma migrate dev --name add_password_field
 
 This command creates and applies database migrations based on changes to your Prisma schema. It generates SQL migration files, updates your database structure, and records the migration in your project history. The `--name add_password_field` parameter labels this migration for tracking purposes.
 
+# Add Zod and React Hook Form
+
+```bash
+npm install zod react-hook-form @hookform/resolvers
+```
+
+This command installs Zod, React Hook Form, and the resolver package for form validation. Zod is a type-safe schema description language and runtime type checker, React Hook Form is a fast, flexible, and extensible form and form controlled components for React + React Native, and the resolver package provides validation and error handling for React Hook Form.
+
+
+
