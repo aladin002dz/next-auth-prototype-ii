@@ -14,10 +14,11 @@ export default async function Dashboard() {
             <div className="flex flex-col items-center gap-4">
               <div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-blue-500">
                 <Image
-                  src={session.user.image || "/default-avatar.svg"}
+                  src={session.user.image || `/api/cloudflare-r2/display-image?image=1743017680938-image2.png`}
                   alt={session.user.name || "User"}
                   fill
                   className="object-cover"
+                  priority
                 />
               </div>
               <div className="text-center">
