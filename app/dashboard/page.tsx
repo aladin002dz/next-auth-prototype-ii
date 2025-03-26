@@ -1,10 +1,24 @@
+import UpdateProfilePicture from "@/app/components/UpdateProfilePicture";
 import { auth } from "@/auth";
-import Image from "next/image";
+import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 
 export default async function Dashboard() {
   const session = await auth();
   if (!session) redirect("/");
+
+  const user = await prisma.user.findUnique({
+    where: {
+      email: session.user!.email!,
+    },
+    select: {
+      image: true,
+    },
+  });
+
+  const imageUrl = user?.image
+    ? `/api/cloudflare-r2/display-image?image=${user.image}`
+    : `/default-avatar.svg`;
 
   return (
     <div className="min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
@@ -12,15 +26,10 @@ export default async function Dashboard() {
         {session?.user && (
           <>
             <div className="flex flex-col items-center gap-4">
-              <div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-blue-500">
-                <Image
-                  src={session.user.image || `/api/cloudflare-r2/display-image?image=1743017680938-image2.png`}
-                  alt={session.user.name || "User"}
-                  fill
-                  className="object-cover"
-                  priority
-                />
-              </div>
+              <UpdateProfilePicture
+                currentImageUrl={imageUrl}
+                userName={session.user.name || "User"}
+              />
               <div className="text-center">
                 <h2 className="text-2xl font-bold text-gray-800">{session.user.name}</h2>
                 <p className="text-gray-600">{session.user.email}</p>

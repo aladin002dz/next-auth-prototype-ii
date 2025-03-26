@@ -1,10 +1,10 @@
-import NextAuth from "next-auth"
-import { PrismaAdapter } from "@auth/prisma-adapter"
 import { prisma } from "@/prisma/prisma"
+import { PrismaAdapter } from "@auth/prisma-adapter"
+import bcrypt from "bcryptjs"
+import NextAuth from "next-auth"
+import Credentials from "next-auth/providers/credentials"
 import GitHub from "next-auth/providers/github"
 import Google from "next-auth/providers/google"
-import Credentials from "next-auth/providers/credentials";
-import bcrypt from "bcryptjs";
 
 // Disable Edge runtime for auth routes
 export const runtime = 'nodejs'
@@ -41,7 +41,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                     if (dbUser && 'password' in dbUser && dbUser.password) {
                         // Verify the password using bcrypt
                         const passwordMatch = await bcrypt.compare(password, dbUser.password as string);
-                        
+
                         if (passwordMatch) {
                             user = {
                                 id: dbUser.id,
@@ -82,7 +82,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             // Always allow Credentials provider
             if (!account) return true;
             if (account.provider === 'credentials') return true;
-            
+
             try {
                 // For OAuth providers, check if we need to link accounts
                 if (user.email) {
@@ -90,16 +90,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                         where: { email: user.email },
                         include: { accounts: true },
                     });
-                    
+
                     if (existingUser) {
                         // Check if this provider is already linked
                         const existingAccount = existingUser.accounts.find(
                             (acc: { provider: string }) => acc.provider === account.provider
                         );
-                        
+
                         // If already linked, proceed with sign-in
                         if (existingAccount) return true;
-                        
+
                         // Otherwise, link the new provider
                         try {
                             await prisma.account.create({
@@ -125,7 +125,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                         }
                     }
                 }
-                
+
                 // For new users, let the adapter handle account creation
                 return true;
             } catch (error) {
