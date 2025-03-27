@@ -13,10 +13,10 @@ export async function POST(request: NextRequest) {
     // Initialize the S3 client with Cloudflare R2 credentials
     const s3Client = new S3Client({
       region: 'auto',
-      endpoint: process.env.NEXT_PUBLIC_CLOUDFLARE_R2_ENDPOINT,
+      endpoint: process.env.CLOUDFLARE_R2_ENDPOINT,
       credentials: {
-        accessKeyId: process.env.NEXT_PUBLIC_CLOUDFLARE_R2_ACCESS_KEY_ID!,
-        secretAccessKey: process.env.NEXT_PUBLIC_CLOUDFLARE_R2_SECRET_ACCESS_KEY!,
+        accessKeyId: process.env.CLOUDFLARE_R2_ACCESS_KEY_ID!,
+        secretAccessKey: process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY!,
       },
     });
 
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
 
     // Create a command to upload the object to the bucket
     const command = new PutObjectCommand({
-      Bucket: process.env.NEXT_PUBLIC_CLOUDFLARE_R2_BUCKET_NAME!,
+      Bucket: process.env.CLOUDFLARE_R2_BUCKET_NAME!,
       Key: fileName,
       Body: buffer,
       ContentType: file.type,
