@@ -1,5 +1,6 @@
 import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { NextRequest, NextResponse } from 'next/server';
+import { Readable } from 'stream';
 
 export async function GET(request: NextRequest) {
   try {
@@ -36,7 +37,7 @@ export async function GET(request: NextRequest) {
 
     // Convert the readable stream to a buffer
     const chunks = [];
-    for await (const chunk of response.Body as any) {
+    for await (const chunk of response.Body as Readable) {
       chunks.push(chunk);
     }
     const buffer = Buffer.concat(chunks);
