@@ -16,9 +16,14 @@ export default async function Dashboard() {
     },
   });
 
-  const imageUrl = user?.image
-    ? `/api/cloudflare-r2/display-image?image=${user.image}`
-    : `/default-avatar.svg`;
+  let imageUrl = null;
+  if (user?.image && user.image.startsWith("https://")) {
+    imageUrl = user.image;
+  } else {
+    imageUrl = user?.image
+      ? `/api/cloudflare-r2/display-image?image=${user.image}`
+      : `/default-avatar.svg`;
+  }
 
   return (
     <div className="min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">

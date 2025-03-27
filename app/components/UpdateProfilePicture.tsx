@@ -68,17 +68,19 @@ export default function UpdateProfilePicture({ currentImageUrl, userName }: Upda
 
     return (
         <div className="relative">
-            <div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-blue-500">
-                <Image
-                    src={previewUrl || currentImageUrl}
-                    alt={userName || "User"}
-                    fill
-                    className="object-cover"
-                    priority
-                />
+            <div className="relative w-24 h-24">
+                <div className="absolute inset-0 rounded-full overflow-hidden border-4 border-blue-500">
+                    <Image
+                        src={previewUrl || currentImageUrl}
+                        alt={userName || "User"}
+                        fill
+                        className="object-cover rounded-full"
+                        priority
+                    />
+                </div>
                 <button
                     onClick={handleImageClick}
-                    className="absolute bottom-0 right-0 bg-blue-500 text-white p-1.5 rounded-full shadow-lg hover:bg-blue-600 transition-colors duration-200"
+                    className="absolute bottom-0 right-0 translate-x-1/4 translate-y-1/4 bg-blue-500 text-white p-3 rounded-full shadow-lg hover:bg-blue-600 transition-colors duration-200 z-10 w-12 h-12 flex items-center justify-center"
                     disabled={isUploading}
                 >
                     <svg
@@ -87,7 +89,7 @@ export default function UpdateProfilePicture({ currentImageUrl, userName }: Upda
                         viewBox="0 0 24 24"
                         strokeWidth={1.5}
                         stroke="currentColor"
-                        className="w-4 h-4"
+                        className="w-6 h-6"
                     >
                         <path
                             strokeLinecap="round"
@@ -116,14 +118,14 @@ export default function UpdateProfilePicture({ currentImageUrl, userName }: Upda
                             setPreviewUrl(null);
                             setSelectedFile(null);
                         }}
-                        className="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+                        className="px-4 py-3 min-w-[48px] min-h-[48px] text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
                         disabled={isUploading}
                     >
                         Cancel
                     </button>
                     <button
                         onClick={handleSave}
-                        className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-blue-300"
+                        className="px-4 py-3 min-w-[48px] min-h-[48px] text-sm bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-blue-300"
                         disabled={isUploading}
                     >
                         {isUploading ? 'Saving...' : 'Save'}
