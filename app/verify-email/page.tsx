@@ -1,11 +1,13 @@
 import { verifyToken } from '@/lib/verification-token';
+import { redirect } from 'next/navigation';
 
 export default async function VerifyEmailPage({
     searchParams,
 }: {
     searchParams: { token: string };
 }) {
-    const { token } = searchParams;
+    const params = await searchParams;
+    const { token } = params;
 
     if (!token) {
         return (
@@ -31,5 +33,5 @@ export default async function VerifyEmailPage({
         );
     }
 
-    //redirect('/dashboard?verified=true');
+    redirect('/dashboard?verified=true');
 } 

@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
         const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL}/verify-email?token=${token}`;
 
         const { data, error } = await resend.emails.send({
-            from: process.env.FROM_EMAIL || 'onboarding@resend.dev',
+            from: process.env.FROM_EMAIL ? `MaroStudio <${process.env.FROM_EMAIL}>` : 'MaroStudio <hello@marostudio.dev>',
             to: email,
             subject: 'Verify your email address',
             html: `
