@@ -123,6 +123,36 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                             // Allow sign-in anyway, even if linking fails
                             return true;
                         }
+                    } else {
+                        // For new OAuth users, create the user with emailVerified set to true
+                        try {
+                            await prisma.user.create({
+                                data: {
+                                    email: user.email,
+                                    name: user.name,
+                                    image: user.image,
+                                    emailVerified: new Date(),
+                                    accounts: {
+                                        create: {
+                                            type: "oauth",
+                                            provider: account.provider,
+                                            providerAccountId: account.providerAccountId,
+                                            refresh_token: account.refresh_token ?? null,
+                                            access_token: account.access_token ?? null,
+                                            expires_at: account.expires_at ?? null,
+                                            token_type: account.token_type ?? null,
+                                            scope: account.scope ?? null,
+                                            id_token: account.id_token ? String(account.id_token) : null,
+                                            session_state: account.session_state ? String(account.session_state) : null
+                                        }
+                                    }
+                                }
+                            });
+                            return true;
+                        } catch (error) {
+                            console.error("Error creating user:", error);
+                            return true;
+                        }
                     }
                 }
 
@@ -134,6 +164,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 return true;
             }
         },
+        async createUser({ user }) {
+            // Set emailVerified for OAuth users
+            if (user.email) {
+                await prisma.user.update({
+                    where: { email: user.email },
+                    data: { emailVerified: new Date() }
+                });
+            }
+        }
     },
     debug: process.env.NODE_ENV === 'development',
 })
