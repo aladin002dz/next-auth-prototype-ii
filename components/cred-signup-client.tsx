@@ -1,21 +1,20 @@
 "use client"
-import { useState } from 'react';
-import { signIn } from 'next-auth/react';
-import { useRouter } from "next/navigation";
 import { registerUser } from '@/app/actions/auth';
-import { z } from 'zod';
-import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from "next/navigation";
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 // Define the form schema with Zod
 const formSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z.string().email('Please enter a valid email address'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
-  confirmPassword: z.string()
+    name: z.string().min(2, 'Name must be at least 2 characters'),
+    email: z.string().email('Please enter a valid email address'),
+    password: z.string().min(8, 'Password must be at least 8 characters'),
+    confirmPassword: z.string()
 }).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords do not match",
-  path: ["confirmPassword"],
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
 });
 
 // Type for our form data based on the schema
@@ -25,7 +24,7 @@ export default function ClientCredentialsSignUp() {
     const router = useRouter();
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
-    
+
     // Initialize React Hook Form with Zod resolver
     const {
         register,
@@ -44,7 +43,7 @@ export default function ClientCredentialsSignUp() {
     const onSubmit = async (data: FormData) => {
         setError(null);
         setLoading(true);
-        
+
         try {
             // Use the server action to register the user
             const result = await registerUser(data);
@@ -52,7 +51,8 @@ export default function ClientCredentialsSignUp() {
             if (result.error) {
                 setError(result.error);
             } else {
-                // If registration is successful, sign in the user
+                // Show verification message
+                //setError("Please check your email to verify your account before signing in.");
                 const signInResult = await signIn("credentials", {
                     email: data.email,
                     password: data.password,
@@ -71,7 +71,7 @@ export default function ClientCredentialsSignUp() {
             console.error("An error occurred during registration:", error);
             setError(error instanceof Error ? error.message : 'An unexpected error occurred');
         }
-        
+
         setLoading(false);
     };
 

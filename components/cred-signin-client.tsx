@@ -1,15 +1,15 @@
 "use client"
-import { useState } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { signIn } from 'next-auth/react';
 import { useRouter } from "next/navigation";
-import { z } from 'zod';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 
 // Define the form schema with Zod
 const formSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
+    email: z.string().email('Please enter a valid email address'),
+    password: z.string().min(8, 'Password must be at least 8 characters'),
 });
 
 // Type for our form data based on the schema
@@ -19,7 +19,7 @@ export default function ClientCredentialsSignIn() {
     const router = useRouter();
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
-    
+
     // Initialize React Hook Form with Zod resolver
     const {
         register,
@@ -36,15 +36,15 @@ export default function ClientCredentialsSignIn() {
     const onSubmit = async (data: FormData) => {
         setError(null);
         setLoading(true);
-        
+
         try {
             const result = await signIn("credentials", {
-                email: data.email,
-                password: data.password,
+                email: data.email.toLowerCase(),
+                password: data.password.toLowerCase(),
                 redirect: false,
                 //redirectTo: "/dashboard"
             });
-            
+
             if (result?.error) {
                 if (result.error === "Configuration")
                     setError("Invalid credentials");
@@ -60,7 +60,7 @@ export default function ClientCredentialsSignIn() {
             console.error("An unexpected error occurred:", error);
             setError('An unexpected error occurred');
         }
-        
+
         setLoading(false);
     };
 

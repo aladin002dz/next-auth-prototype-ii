@@ -1,5 +1,6 @@
 'use server'
 
+import { createVerificationToken } from '@/lib/verification-token'
 import { prisma } from '@/prisma/prisma'
 import bcrypt from 'bcryptjs'
 
@@ -28,7 +29,7 @@ export async function registerUser(formData: {
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
-      where: { email: formData.email },
+      where: { email: formData.email.toLowerCase() },
     })
 
     if (existingUser) {
@@ -42,19 +43,41 @@ export async function registerUser(formData: {
     const user = await prisma.user.create({
       data: {
         name: formData.name,
-        email: formData.email,
+        email: formData.email.toLowerCase(),
         password: hashedPassword,
+        emailVerified: null, // Set to null initially
       },
     })
 
+    // Create verification token
+    const token = await createVerificationToken(formData.email)
+
+    // Send verification email
+    const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/send-verification`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: formData.email.toLowerCase(),
+        token,
+      }),
+    })
+
+    if (!response.ok) {
+      console.error('Failed to send verification email')
+      // Continue with registration even if email sending fails
+    }
+
     // Return success
-    return { 
-      success: true, 
-      user: { 
-        id: user.id, 
-        name: user.name, 
-        email: user.email 
-      } 
+    return {
+      success: true,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email.toLowerCase(),
+        emailVerified: user.emailVerified
+      }
     }
   } catch (error) {
     console.error('Registration error:', error)

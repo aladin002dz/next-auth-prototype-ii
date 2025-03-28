@@ -34,7 +34,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 // Check for registered users in the database
                 try {
                     const dbUser = await prisma.user.findUnique({
-                        where: { email },
+                        where: { email: email.toLowerCase() },
                     })
 
                     // Check if user exists and has a password field

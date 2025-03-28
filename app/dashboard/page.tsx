@@ -13,6 +13,7 @@ export default async function Dashboard() {
     },
     select: {
       image: true,
+      emailVerified: true,
     },
   });
 
@@ -38,6 +39,28 @@ export default async function Dashboard() {
               <div className="text-center">
                 <h2 className="text-2xl font-bold text-gray-800">{session.user.name}</h2>
                 <p className="text-gray-600">{session.user.email}</p>
+                <div className="mt-2">
+                  {user?.emailVerified ? (
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      <svg className="mr-1.5 h-2 w-2 text-green-400" fill="currentColor" viewBox="0 0 8 8">
+                        <circle cx="4" cy="4" r="3" />
+                      </svg>
+                      Email Verified
+                    </span>
+                  ) : (
+                    <div className="flex flex-col items-center gap-2">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                        <svg className="mr-1.5 h-2 w-2 text-yellow-400" fill="currentColor" viewBox="0 0 8 8">
+                          <circle cx="4" cy="4" r="3" />
+                        </svg>
+                        Email Not Verified
+                      </span>
+                      <p className="text-xs text-gray-500">
+                        Please check your email for a verification link
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
             <div className="w-full pt-4 border-t border-gray-200">
