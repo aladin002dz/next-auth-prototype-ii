@@ -1,13 +1,23 @@
 import { verifyToken } from '@/lib/verification-token';
 import { redirect } from 'next/navigation';
 
-export default async function VerifyEmailPage({
-    searchParams,
-}: {
-    searchParams: { token: string };
+type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>
+
+export async function generateMetadata(props: {
+    searchParams: SearchParams
 }) {
-    const params = await searchParams;
-    const { token } = params;
+    const searchParams = await props.searchParams
+    const token = searchParams.token as string
+    return {
+        title: token || 'Verify Email'
+    }
+}
+
+export default async function VerifyEmailPage(props: {
+    searchParams: SearchParams
+}) {
+    const searchParams = await props.searchParams
+    const token = (searchParams.token as string)
 
     if (!token) {
         return (
