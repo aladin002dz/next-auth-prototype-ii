@@ -164,14 +164,33 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 return true;
             }
         },
+
+    },
+    events: {
         async createUser({ user }) {
+            //check if user is created from oauth
+            const existingUser = await prisma.user.findUnique({
+                where: { email: user.email! },
+                include: { accounts: true },
+            });
+
+            if (existingUser) {
+                //check if user is created from oauth
+                if (existingUser.accounts.length > 0) {
+                    //set emailVerified for OAuth users
+                    await prisma.user.update({
+                        where: { email: user.email! },
+                        data: { emailVerified: new Date() }
+                    });
+                }
+            }
             // Set emailVerified for OAuth users
-            if (user.email) {
+            /*if (user.email) {
                 await prisma.user.update({
                     where: { email: user.email },
                     data: { emailVerified: new Date() }
                 });
-            }
+            }*/
         }
     },
     debug: process.env.NODE_ENV === 'development',
