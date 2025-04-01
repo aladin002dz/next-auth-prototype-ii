@@ -7,11 +7,9 @@ This is a [Next.js](https://nextjs.org) project for authentication using [Next-A
 This project demonstrates a modern authentication implementation using Next.js and Next-Auth v5 (Auth.js). It showcases the latest features of Auth.js including:
 
 - Server-side authentication with the new Next-Auth v5 API
-- Google OAuth provider integration
-- User profile display with avatar
-- Secure session management
-- Clean and modern UI with Tailwind CSS
-- Responsive design
+- Google and Github OAuth provider integration
+- Update & display profile picture with Cloudflare R2
+- Email validation with Resend.
 
 # Install Prisma
 
@@ -27,6 +25,7 @@ npx prisma init
 ```
 
 This command initializes a new Prisma project in your current directory by:
+
 - Creating a new `prisma` directory in your project
 - Generating a basic `schema.prisma` file inside that directory, which defines your database schema and connection
 - Creating a `.env` file in your project root to store your database connection string
@@ -42,8 +41,10 @@ postgresql://johndoe:randompassword@localhost:5432/mydb?schema=public
 ```
 
 put the connection string in the **`.env`** file
+
 ```js
-DATABASE_URL="postgresql://johndoe:randompassword@localhost:5432/mydb?schema=public"
+DATABASE_URL =
+  "postgresql://johndoe:randompassword@localhost:5432/mydb?schema=public";
 ```
 
 ## Initialize Prisma Client
@@ -86,5 +87,68 @@ npm install zod react-hook-form @hookform/resolvers
 
 This command installs Zod, React Hook Form, and the resolver package for form validation. Zod is a type-safe schema description language and runtime type checker, React Hook Form is a fast, flexible, and extensible form and form controlled components for React + React Native, and the resolver package provides validation and error handling for React Hook Form.
 
+# Add Resend
 
+```bash
+npm install resend
+```
 
+# Add Cloudflare R2
+
+```bash
+npm install @aws-sdk/client-s3 @aws-sdk/s3-request-presigner
+```
+
+## Setting up Cloudflare R2
+
+1. Sign up for a Cloudflare account at [cloudflare.com](https://cloudflare.com)
+2. Navigate to the R2 section in your Cloudflare dashboard
+3. Create a new R2 bucket:
+   - Click "Create bucket"
+   - Give your bucket a unique name
+   - Choose a region (if applicable)
+4. Create API tokens:
+   - Go to "Manage R2 API Tokens"
+   - Click "Create API Token"
+   - Select the appropriate permissions (read/write access)
+   - Save the Access Key ID and Secret Access Key
+
+## Environment Variables
+
+Create a `.env` file with the following variables:
+
+```env
+CLOUDFLARE_R2_ACCESS_KEY_ID=your_access_key_id_here
+CLOUDFLARE_R2_SECRET_ACCESS_KEY=your_secret_access_key_here
+CLOUDFLARE_R2_ENDPOINT=your_r2_endpoint_url_here
+CLOUDFLARE_R2_BUCKET_NAME=your_bucket_name_here
+```
+
+## CORS Configuration
+
+Configure CORS on your R2 bucket. This is essential for allowing uploads directly from your web application's domain.
+
+**Go to your R2 bucket `settings -> CORS Policy`.**
+
+Add a policy like this (adjust AllowedOrigins to match your development and production domains):
+
+```json
+[
+  {
+    "AllowedOrigins": [
+      "http://localhost:3000", // Your dev environment
+      "https://your-production-domain.com" // Your production domain
+    ],
+    "AllowedMethods": [
+      "PUT",
+      "GET" // Often useful for retrieving later
+    ],
+    "AllowedHeaders": [
+      "Content-Type", // Required for setting file type
+      "*" // Or list specific headers if needed
+    ],
+    "ExposeHeaders": [],
+    "MaxAgeSeconds": 4000
+  }
+]
+```
