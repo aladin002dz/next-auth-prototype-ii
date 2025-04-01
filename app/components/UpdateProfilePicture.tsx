@@ -62,22 +62,29 @@ export default function UpdateProfilePicture({ currentImageUrl, userName }: Upda
         try {
             setIsUploading(true);
 
-            // Create FormData with the image
+            // First, get the presigned URL
             const formData = new FormData();
             formData.append('file', selectedFile);
 
-            // Upload image to Cloudflare R2
-            const uploadResponse = await fetch('/api/cloudflare-r2/upload-image', {
+            const presignedUrlResponse = await fetch('/api/cloudflare-r2/upload-image', {
                 method: 'POST',
                 body: formData,
             });
 
-            if (!uploadResponse.ok) {
-                throw new Error('Failed to upload image');
+            if (!presignedUrlResponse.ok) {
+                throw new Error('Failed to get upload URL');
             }
 
-            const uploadData = await uploadResponse.json();
-            console.log('Upload response:', uploadData);
+            const { url } = await presignedUrlResponse.json();
+
+            // Upload the file directly to R2 using the presigned URL
+            await fetch(url, {
+                method: 'PUT',
+                body: selectedFile,
+                headers: {
+                    'Content-Type': selectedFile.type,
+                },
+            });
 
             // Clear preview
             setPreviewUrl(null);
