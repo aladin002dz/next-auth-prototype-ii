@@ -18,12 +18,15 @@ export default async function Dashboard() {
   });
 
   let imageUrl = null;
-  if (user?.image && user.image.startsWith("https://")) {
-    imageUrl = user.image;
+  if (user?.image) {
+    if (user.image.startsWith("https://")) {
+      imageUrl = user.image;
+    } else {
+      // For images stored in R2, we'll use the display-image endpoint
+      imageUrl = `/api/cloudflare-r2/display-image?image=${encodeURIComponent(user.image)}`;
+    }
   } else {
-    imageUrl = user?.image
-      ? `/api/cloudflare-r2/display-image?image=${user.image}`
-      : `/default-avatar.svg`;
+    imageUrl = `/default-avatar.svg`;
   }
 
   return (

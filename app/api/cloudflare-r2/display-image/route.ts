@@ -1,6 +1,6 @@
 import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { NextRequest, NextResponse } from 'next/server';
-import { Readable } from 'stream';
 
 export async function GET(request: NextRequest) {
   try {
@@ -24,35 +24,19 @@ export async function GET(request: NextRequest) {
       Key: imageName,
     });
 
-    // Execute the command to get the object
-    const response = await s3Client.send(command);
+    // Generate a presigned URL for GET requests
+    const presignedUrl = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
 
-    // Check if we got a response with a body
-    if (!response.Body) {
-      return NextResponse.json(
-        { error: 'Image not found' },
-        { status: 404 }
-      );
-    }
-
-    // Convert the readable stream to a buffer
-    const chunks = [];
-    for await (const chunk of response.Body as Readable) {
-      chunks.push(chunk);
-    }
-    const buffer = Buffer.concat(chunks);
-
-    // Return the image with appropriate content type
-    return new NextResponse(buffer, {
-      headers: {
-        'Content-Type': response.ContentType || 'image/jpeg',
-        'Cache-Control': 'public, max-age=3600',
-      },
+    // Return the presigned URL
+    return NextResponse.json({
+      url: presignedUrl,
+      fileName: imageName,
+      message: 'Presigned URL generated successfully for GET request',
     });
   } catch (error) {
-    console.error('Error fetching image from R2:', error);
+    console.error('Error generating presigned URL for GET:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch image' },
+      { error: 'Failed to generate presigned URL' },
       { status: 500 }
     );
   }

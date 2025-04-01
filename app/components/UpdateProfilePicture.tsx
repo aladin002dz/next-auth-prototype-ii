@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface UpdateProfilePictureProps {
     currentImageUrl: string;
@@ -12,9 +12,36 @@ interface UpdateProfilePictureProps {
 export default function UpdateProfilePicture({ currentImageUrl, userName }: UpdateProfilePictureProps) {
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [isUploading, setIsUploading] = useState(false);
+    const [imageUrl, setImageUrl] = useState<string>(currentImageUrl);
+    const [isLoading, setIsLoading] = useState(true);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const router = useRouter();
+
+    useEffect(() => {
+        const fetchPresignedUrl = async () => {
+            if (currentImageUrl && currentImageUrl.includes('/api/cloudflare-r2/display-image')) {
+                try {
+                    setIsLoading(true);
+                    const response = await fetch(currentImageUrl);
+                    const data = await response.json();
+                    if (data.url) {
+                        setImageUrl(data.url);
+                    }
+                } catch (error) {
+                    console.error('Error fetching presigned URL:', error);
+                    setImageUrl('/default-avatar.svg');
+                } finally {
+                    setIsLoading(false);
+                }
+            } else {
+                setImageUrl(currentImageUrl);
+                setIsLoading(false);
+            }
+        };
+
+        fetchPresignedUrl();
+    }, [currentImageUrl]);
 
     const handleImageClick = () => {
         fileInputRef.current?.click();
@@ -70,18 +97,24 @@ export default function UpdateProfilePicture({ currentImageUrl, userName }: Upda
         <div className="relative">
             <div className="relative w-24 h-24">
                 <div className="absolute inset-0 rounded-full overflow-hidden border-4 border-blue-500">
-                    <Image
-                        src={previewUrl || currentImageUrl}
-                        alt={userName || "User"}
-                        fill
-                        className="object-cover rounded-full"
-                        priority
-                    />
+                    {isLoading ? (
+                        <div className="flex justify-center items-center h-full bg-gray-100">
+                            <div className="animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent"></div>
+                        </div>
+                    ) : (
+                        <Image
+                            src={previewUrl || imageUrl}
+                            alt={userName || "User"}
+                            fill
+                            className="object-cover rounded-full"
+                            priority
+                        />
+                    )}
                 </div>
                 <button
                     onClick={handleImageClick}
                     className="absolute bottom-0 right-0 translate-x-1/4 translate-y-1/4 bg-blue-500 text-white p-3 rounded-full shadow-lg hover:bg-blue-600 transition-colors duration-200 z-10 w-12 h-12 flex items-center justify-center"
-                    disabled={isUploading}
+                    disabled={isUploading || isLoading}
                 >
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -119,14 +152,14 @@ export default function UpdateProfilePicture({ currentImageUrl, userName }: Upda
                             setSelectedFile(null);
                         }}
                         className="px-4 py-3 min-w-[48px] min-h-[48px] text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
-                        disabled={isUploading}
+                        disabled={isUploading || isLoading}
                     >
                         Cancel
                     </button>
                     <button
                         onClick={handleSave}
                         className="px-4 py-3 min-w-[48px] min-h-[48px] text-sm bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-blue-300"
-                        disabled={isUploading}
+                        disabled={isUploading || isLoading}
                     >
                         {isUploading ? 'Saving...' : 'Save'}
                     </button>
