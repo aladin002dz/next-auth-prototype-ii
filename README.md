@@ -1,6 +1,6 @@
 This is a [Next.js](https://nextjs.org) project for authentication using [Next-Auth V5](https://next-auth.js.org).
 
-[![Next.js](https://img.shields.io/badge/Next.js-13-black?style=for-the-badge&logo=next.js)](https://nextjs.org)
+[![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js)](https://nextjs.org)
 [![Next-Auth](https://img.shields.io/badge/Next--Auth-v5-blue?style=for-the-badge&logo=next.js)](https://next-auth.js.org)
 [![Prisma](https://img.shields.io/badge/Prisma-ORM-blue?style=for-the-badge&logo=prisma)](https://www.prisma.io)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org)
