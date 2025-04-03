@@ -1,5 +1,15 @@
 This is a [Next.js](https://nextjs.org) project for authentication using [Next-Auth V5](https://next-auth.js.org).
 
+[![Next.js](https://img.shields.io/badge/Next.js-13-black?style=for-the-badge&logo=next.js)](https://nextjs.org)
+[![Next-Auth](https://img.shields.io/badge/Next--Auth-v5-blue?style=for-the-badge&logo=next.js)](https://next-auth.js.org)
+[![Prisma](https://img.shields.io/badge/Prisma-ORM-blue?style=for-the-badge&logo=prisma)](https://www.prisma.io)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org)
+[![Cloudflare R2](https://img.shields.io/badge/Cloudflare-R2-orange?style=for-the-badge&logo=cloudflare)](https://www.cloudflare.com/products/r2)
+[![Resend](https://img.shields.io/badge/Resend-Email-purple?style=for-the-badge&logo=resend)](https://resend.com)
+[![React Hook Form](https://img.shields.io/badge/React_Hook_Form-7.0-blue?style=for-the-badge&logo=react)](https://react-hook-form.com)
+[![Zod](https://img.shields.io/badge/Zod-3.0-purple?style=for-the-badge&logo=zod)](https://zod.dev)
+[![AWS S3 SDK](https://img.shields.io/badge/AWS_S3_SDK-3.0-orange?style=for-the-badge&logo=amazonaws)](https://aws.amazon.com/sdk-for-javascript/)
+
 🌐 Check out the [Live Demo](https://next-auth-prototype.vercel.app/)
 
 ## About
@@ -36,8 +46,8 @@ The `schema.prisma` file is the core configuration file for Prisma where you'll 
 
 on [neon.tech](https://neon.tech) create a new database, and get the connection string, that will look like this:
 
-```
-postgresql://johndoe:randompassword@localhost:5432/mydb?schema=public
+```postgresql://johndoe:randompassword@localhost:5432/mydb?schema=public
+
 ```
 
 put the connection string in the **`.env`** file
