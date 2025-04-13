@@ -1,5 +1,6 @@
 'use server';
-
+import { auth } from "@/auth";
+import { prisma } from "@/lib/prisma";
 import { GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
@@ -38,22 +39,33 @@ export async function getR2ImageUrl(imageName: string = 'image2.png') {
 }
 
 // Function to get a presigned URL for uploading an image
-export async function getUploadUrl(filename: string, filetype: string) {
+export async function getUploadUrl(fileName: string, filetype: string) {
     try {
+        const session = await auth();
+        if (!session?.user?.email) {
+            throw new Error('Unauthorized');
+        }
         // Create a command to put the object in the bucket
         const command = new PutObjectCommand({
             Bucket: process.env.CLOUDFLARE_R2_BUCKET_NAME!,
-            Key: filename,
+            Key: fileName,
             ContentType: filetype,
         });
 
         // Generate a presigned URL for PUT requests
         const presignedUrl = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
-
+        await prisma.user.update({
+            where: {
+                email: session.user.email,
+            },
+            data: {
+                image: fileName,
+            },
+        });
         // Return the presigned URL
         return {
             url: presignedUrl,
-            fileName: filename,
+            fileName: fileName,
             message: 'Presigned URL generated successfully for PUT request',
         };
     } catch (error) {

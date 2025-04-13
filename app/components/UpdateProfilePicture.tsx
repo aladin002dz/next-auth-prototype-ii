@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { getR2ImageUrl } from '../actions/cloudflare-r2';
+import { getR2ImageUrl, getUploadUrl } from '../actions/cloudflare-r2';
 
 interface UpdateProfilePictureProps {
     currentImageUrl: string;
@@ -71,20 +71,11 @@ export default function UpdateProfilePicture({ currentImageUrl, userName }: Upda
         try {
             setIsUploading(true);
 
-            // First, get the presigned URL
-            const formData = new FormData();
-            formData.append('file', selectedFile);
+            // Generate a unique filename
+            const fileName = `${Date.now()}-${selectedFile.name}`;
 
-            const presignedUrlResponse = await fetch('/api/cloudflare-r2/upload-image', {
-                method: 'POST',
-                body: formData,
-            });
-
-            if (!presignedUrlResponse.ok) {
-                throw new Error('Failed to get upload URL');
-            }
-
-            const { url } = await presignedUrlResponse.json();
+            // Get the presigned URL using the getUploadUrl function
+            const { url } = await getUploadUrl(fileName, selectedFile.type);
 
             // Upload the file directly to R2 using the presigned URL
             await fetch(url, {
