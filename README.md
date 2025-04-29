@@ -12,14 +12,14 @@ This is a [Next.js](https://nextjs.org) project for authentication using [Next-A
 
 🌐 Check out the [Live Demo](https://next-auth-prototype.vercel.app/)
 
-## About
+## Features
 
-This project demonstrates a modern authentication implementation using Next.js and Next-Auth v5 (Auth.js). It showcases the latest features of Auth.js including:
-
-- Server-side authentication with the new Next-Auth v5 API
-- Google and Github OAuth provider integration
-- Update & display profile picture with Cloudflare R2
-- Email validation with Resend.
+- [x] Signup and Signin with Email and Password.
+- [x] Google and Github OAuth provider integration
+- [x] Update & display profile picture with Cloudflare R2 using AWS S3 SDK.
+- [x] Email verification with Resend.
+- [x] Sign out.
+- [ ] Password reset with Resend.
 
 # Install Prisma
 
