@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import { getR2ImageUrl, getUploadUrl } from '../actions/cloudflare-r2';
 
 interface UpdateProfilePictureProps {
     currentImageUrl: string;
@@ -23,10 +24,18 @@ export default function UpdateProfilePicture({ currentImageUrl, userName }: Upda
             if (currentImageUrl && currentImageUrl.includes('/api/cloudflare-r2/display-image')) {
                 try {
                     setIsLoading(true);
-                    const response = await fetch(currentImageUrl);
-                    const data = await response.json();
-                    if (data.url) {
-                        setImageUrl(data.url);
+                    // Extract the image name from the URL
+                    const urlParams = new URLSearchParams(currentImageUrl.split('?')[1]);
+                    const imageName = urlParams.get('image') || '';
+
+                    if (imageName) {
+                        // Use getR2ImageUrl with the correct image name
+                        const { url } = await getR2ImageUrl(imageName);
+                        if (url) {
+                            setImageUrl(url);
+                        }
+                    } else {
+                        setImageUrl('/default-avatar.svg');
                     }
                 } catch (error) {
                     console.error('Error fetching presigned URL:', error);
@@ -62,20 +71,11 @@ export default function UpdateProfilePicture({ currentImageUrl, userName }: Upda
         try {
             setIsUploading(true);
 
-            // First, get the presigned URL
-            const formData = new FormData();
-            formData.append('file', selectedFile);
+            // Generate a unique filename
+            const fileName = `${Date.now()}-${selectedFile.name}`;
 
-            const presignedUrlResponse = await fetch('/api/cloudflare-r2/upload-image', {
-                method: 'POST',
-                body: formData,
-            });
-
-            if (!presignedUrlResponse.ok) {
-                throw new Error('Failed to get upload URL');
-            }
-
-            const { url } = await presignedUrlResponse.json();
+            // Get the presigned URL using the getUploadUrl function
+            const { url } = await getUploadUrl(fileName, selectedFile.type);
 
             // Upload the file directly to R2 using the presigned URL
             await fetch(url, {
