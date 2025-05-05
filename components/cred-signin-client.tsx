@@ -1,6 +1,7 @@
 "use client"
 import { zodResolver } from '@hookform/resolvers/zod';
 import { signIn } from 'next-auth/react';
+import Link from 'next/link';
 import { useRouter } from "next/navigation";
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -99,6 +100,14 @@ export default function ClientCredentialsSignIn() {
                     {errors.password && (
                         <p className="mt-1 text-sm text-red-500">{errors.password.message}</p>
                     )}
+                </div>
+                <div className="text-right">
+                    <Link
+                        href="/forgot-password"
+                        className="text-sm text-indigo-600 hover:text-indigo-500"
+                    >
+                        Forgot password?
+                    </Link>
                 </div>
                 <button
                     disabled={loading}
