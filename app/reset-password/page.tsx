@@ -1,5 +1,6 @@
 'use client'
 
+import { resetPassword } from '@/app/actions/auth'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
@@ -27,24 +28,14 @@ export default function ResetPassword() {
         }
 
         try {
-            const response = await fetch('/api/auth/reset-password', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ token, password }),
-            })
+            const result = await resetPassword(token, password)
 
-            const data = await response.json()
-
-            if (!response.ok) {
-                throw new Error(data.message || 'Something went wrong')
+            if (result.error) {
+                setError(result.error)
+                return
             }
 
-            setSuccess('Password has been reset successfully')
-            setTimeout(() => {
-                router.push('/login')
-            }, 2000)
+            router.push('/?message=Password has been reset successfully')
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Something went wrong')
         } finally {

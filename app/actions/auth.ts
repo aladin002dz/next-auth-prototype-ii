@@ -76,3 +76,60 @@ export async function registerUser(formData: {
     return { error: 'An error occurred during registration' }
   }
 }
+
+export async function resetPassword(token: string, password: string) {
+  try {
+    if (!token || !password) {
+      return { error: 'Token and password are required' }
+    }
+
+    // Find valid verification token
+    const verificationToken = await prisma.verificationToken.findFirst({
+      where: {
+        token,
+        expires: {
+          gt: new Date(), // Token hasn't expired
+        },
+      },
+    })
+
+    if (!verificationToken) {
+      return { error: 'Invalid or expired reset token' }
+    }
+
+    // Find user by email
+    const user = await prisma.user.findUnique({
+      where: { email: verificationToken.identifier },
+    })
+
+    if (!user) {
+      return { error: 'User not found' }
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(password, 10)
+
+    // Update user's password
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        password: hashedPassword,
+      },
+    })
+
+    // Delete the used verification token
+    await prisma.verificationToken.delete({
+      where: {
+        identifier_token: {
+          identifier: verificationToken.identifier,
+          token: verificationToken.token,
+        },
+      },
+    })
+
+    return { success: true, message: 'Password has been reset successfully' }
+  } catch (error) {
+    console.error('Password reset error:', error)
+    return { error: 'Something went wrong' }
+  }
+}
