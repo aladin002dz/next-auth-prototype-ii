@@ -21,7 +21,7 @@ This is a [Next.js](https://nextjs.org) project for authentication using [Next-A
 - [x] Sign out.
 - [x] Forgot password with Resend.
 - [x] Change password.
-- [ ] Change email validation by link to validation by code.
+- [ ] Change email "validation by link" to "validation by code".
 
 # Install Prisma
 
