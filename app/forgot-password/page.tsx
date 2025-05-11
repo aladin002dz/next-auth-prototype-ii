@@ -1,6 +1,6 @@
 'use client'
 
-import { requestPasswordReset } from '@/app/actions/auth'
+import { requestPasswordReset } from '@/actions/auth'
 import Link from 'next/link'
 import { useState } from 'react'
 

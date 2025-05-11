@@ -1,9 +1,9 @@
 'use client';
 
+import { getR2ImageUrl, getUploadUrl } from '@/actions/cloudflare-r2';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { getR2ImageUrl, getUploadUrl } from '../actions/cloudflare-r2';
 
 interface UpdateProfilePictureProps {
     currentImageUrl: string;

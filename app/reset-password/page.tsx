@@ -1,6 +1,6 @@
 'use client'
 
-import { resetPassword } from '@/app/actions/auth'
+import { resetPassword } from '@/actions/auth'
 import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'

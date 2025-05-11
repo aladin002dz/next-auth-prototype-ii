@@ -1,7 +1,7 @@
-import UpdateProfilePicture from "@/app/components/UpdateProfilePicture";
 import { auth } from "@/auth";
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/prisma/prisma";
 import { redirect } from "next/navigation";
+import UpdateProfilePicture from "./components/UpdateProfilePicture";
 
 export default async function Dashboard() {
   const session = await auth();
