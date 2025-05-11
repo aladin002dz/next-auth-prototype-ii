@@ -19,7 +19,8 @@ This is a [Next.js](https://nextjs.org) project for authentication using [Next-A
 - [x] Update & display profile picture with Cloudflare R2 using AWS S3 SDK.
 - [x] Email verification with Resend.
 - [x] Sign out.
-- [ ] Password reset with Resend.
+- [x] Forgot password with Resend.
+- [x] Change password.
 - [ ] Change email validation by link to validation by code.
 
 # Install Prisma
