@@ -41,7 +41,7 @@ export default function ClientCredentialsSignIn() {
         try {
             const result = await signIn("credentials", {
                 email: data.email.toLowerCase(),
-                password: data.password.toLowerCase(),
+                password: data.password,
                 redirect: false,
                 //redirectTo: "/dashboard"
             });

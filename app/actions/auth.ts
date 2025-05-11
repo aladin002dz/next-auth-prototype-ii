@@ -3,7 +3,8 @@
 import { createVerificationToken } from '@/lib/verification-token'
 import { prisma } from '@/prisma/prisma'
 import bcrypt from 'bcryptjs'
-import { sendVerificationEmail } from './email'
+import { randomBytes } from 'crypto'
+import { sendPasswordResetEmail, sendVerificationEmail } from './email'
 
 // Disable Edge runtime for Prisma compatibility
 //export const runtime = 'nodejs'
@@ -130,6 +131,50 @@ export async function resetPassword(token: string, password: string) {
     return { success: true, message: 'Password has been reset successfully' }
   } catch (error) {
     console.error('Password reset error:', error)
+    return { error: 'Something went wrong' }
+  }
+}
+
+export async function requestPasswordReset(email: string) {
+  try {
+    if (!email) {
+      return { error: 'Email is required' }
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { email: email.toLowerCase() },
+    })
+
+    if (!user) {
+      // Return success even if user doesn't exist to prevent email enumeration
+      return {
+        success: true,
+        message: 'If an account exists with this email, you will receive a password reset link'
+      }
+    }
+
+    // Generate reset token
+    const token = randomBytes(32).toString('hex')
+    const expires = new Date(Date.now() + 3600000) // 1 hour from now
+
+    // Store reset token in VerificationToken table
+    await prisma.verificationToken.create({
+      data: {
+        identifier: email.toLowerCase(),
+        token,
+        expires,
+      },
+    })
+
+    // Send reset email
+    await sendPasswordResetEmail(email.toLowerCase(), token)
+
+    return {
+      success: true,
+      message: 'If an account exists with this email, you will receive a password reset link'
+    }
+  } catch (error) {
+    console.error('Password reset request error:', error)
     return { error: 'Something went wrong' }
   }
 }

@@ -1,7 +1,7 @@
 'use client'
 
+import { requestPasswordReset } from '@/app/actions/auth'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 export default function ForgotPassword() {
@@ -9,7 +9,6 @@ export default function ForgotPassword() {
     const [error, setError] = useState('')
     const [success, setSuccess] = useState('')
     const [isLoading, setIsLoading] = useState(false)
-    const router = useRouter()
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -18,21 +17,13 @@ export default function ForgotPassword() {
         setSuccess('')
 
         try {
-            const response = await fetch('/api/auth/reset-password/request', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email }),
-            })
+            const result = await requestPasswordReset(email)
 
-            const data = await response.json()
-
-            if (!response.ok) {
-                throw new Error(data.message || 'Something went wrong')
+            if (result.error) {
+                throw new Error(result.error)
             }
 
-            setSuccess('Password reset link has been sent to your email')
+            setSuccess(result.message || 'Password reset link has been sent to your email')
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Something went wrong')
         } finally {
@@ -48,7 +39,7 @@ export default function ForgotPassword() {
                         Reset your password
                     </h2>
                     <p className="mt-2 text-center text-sm text-gray-600">
-                        Enter your email address and we'll send you a link to reset your password.
+                        Enter your email address and we&apos;ll send you a link to reset your password.
                     </p>
                 </div>
                 <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
