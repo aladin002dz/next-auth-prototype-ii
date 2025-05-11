@@ -52,7 +52,7 @@ export default function ChangePassword() {
                 reset() // Clear the form
                 setIsFormVisible(false) // Hide the form after successful password change
             }
-        } catch (err) {
+        } catch {
             setError('An unexpected error occurred')
         } finally {
             setIsLoading(false)
