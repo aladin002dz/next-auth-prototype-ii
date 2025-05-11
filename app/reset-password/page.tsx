@@ -4,7 +4,7 @@ import { resetPassword } from '@/app/actions/auth'
 import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -25,7 +25,7 @@ const formSchema = z.object({
 // Type for our form data based on the schema
 type FormData = z.infer<typeof formSchema>
 
-export default function ResetPassword() {
+function ResetPasswordContent() {
     const router = useRouter()
     const searchParams = useSearchParams()
     const token = searchParams.get('token')
@@ -151,5 +151,19 @@ export default function ResetPassword() {
                 </form>
             </div>
         </div>
+    )
+}
+
+export default function ResetPassword() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <div className="text-center">
+                    <h2 className="text-xl font-semibold text-gray-900">Loading...</h2>
+                </div>
+            </div>
+        }>
+            <ResetPasswordContent />
+        </Suspense>
     )
 } 
