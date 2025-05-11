@@ -102,65 +102,52 @@ export default function ResetPassword() {
                     </p>
                 </div>
                 <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
-                    <div className="rounded-md shadow-sm -space-y-px">
+                    <div className="space-y-4">
                         <div>
-                            <label htmlFor="password" className="sr-only">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
                                 New Password
                             </label>
                             <input
                                 id="password"
                                 type="password"
                                 {...register('password')}
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                                placeholder="New Password"
+                                className={`w-full rounded-lg border ${errors.password ? 'border-red-300' : 'border-gray-300'} px-4 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 ${errors.password ? 'focus:ring-red-300' : 'focus:ring-gray-300'}`}
+                                placeholder="Enter your new password"
                             />
                             {errors.password && (
-                                <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+                                <p className="mt-1 text-sm text-red-500">{errors.password.message}</p>
                             )}
                         </div>
                         <div>
-                            <label htmlFor="confirm-password" className="sr-only">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
                                 Confirm Password
                             </label>
                             <input
                                 id="confirm-password"
                                 type="password"
                                 {...register('confirmPassword')}
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                                placeholder="Confirm Password"
+                                className={`w-full rounded-lg border ${errors.confirmPassword ? 'border-red-300' : 'border-gray-300'} px-4 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 ${errors.confirmPassword ? 'focus:ring-red-300' : 'focus:ring-gray-300'}`}
+                                placeholder="Confirm your new password"
                             />
                             {errors.confirmPassword && (
-                                <p className="mt-1 text-sm text-red-600">{errors.confirmPassword.message}</p>
+                                <p className="mt-1 text-sm text-red-500">{errors.confirmPassword.message}</p>
                             )}
                         </div>
                     </div>
 
                     {successMessage && (
-                        <div className="rounded-md bg-green-50 p-4">
-                            <div className="flex">
-                                <div className="flex-shrink-0">
-                                    <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                                    </svg>
-                                </div>
-                                <div className="ml-3">
-                                    <p className="text-sm font-medium text-green-800">
-                                        {successMessage}
-                                    </p>
-                                </div>
-                            </div>
+                        <div className="p-3 text-sm text-green-500 bg-green-50 rounded-lg border border-green-200">
+                            {successMessage}
                         </div>
                     )}
 
-                    <div>
-                        <button
-                            type="submit"
-                            disabled={isSubmitting}
-                            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
-                        >
-                            {isSubmitting ? 'Resetting...' : 'Reset Password'}
-                        </button>
-                    </div>
+                    <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="w-full rounded-lg bg-gray-800 px-6 py-2 text-sm font-medium text-white shadow-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:opacity-70"
+                    >
+                        {isSubmitting ? 'Resetting...' : 'Reset Password'}
+                    </button>
                 </form>
             </div>
         </div>
