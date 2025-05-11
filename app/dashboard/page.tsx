@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
 import { prisma } from "@/prisma/prisma";
 import { redirect } from "next/navigation";
+import ChangePassword from "./components/ChangePassword";
 import UpdateProfilePicture from "./components/UpdateProfilePicture";
 
 export default async function Dashboard() {
@@ -71,6 +72,9 @@ export default async function Dashboard() {
                 Session expires: {new Date(session.expires).toLocaleDateString()} at{" "}
                 {new Date(session.expires).toLocaleTimeString()}
               </p>
+            </div>
+            <div className="w-full pt-4 border-t border-gray-200 mt-4">
+              <ChangePassword />
             </div>
           </>
         )}

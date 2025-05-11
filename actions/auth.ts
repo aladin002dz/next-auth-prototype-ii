@@ -1,5 +1,6 @@
 'use server'
 
+import { auth } from '@/auth'
 import { createVerificationToken } from '@/lib/verification-token'
 import { prisma } from '@/prisma/prisma'
 import bcrypt from 'bcryptjs'
@@ -175,6 +176,44 @@ export async function requestPasswordReset(email: string) {
     }
   } catch (error) {
     console.error('Password reset request error:', error)
+    return { error: 'Something went wrong' }
+  }
+}
+
+export async function changePassword(currentPassword: string, newPassword: string) {
+  try {
+    const session = await auth()
+    if (!session?.user?.email) {
+      return { error: 'Not authenticated' }
+    }
+
+    // Find user
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+    })
+
+    if (!user || !user.password) {
+      return { error: 'User not found' }
+    }
+
+    // Verify current password
+    const isPasswordValid = await bcrypt.compare(currentPassword, user.password)
+    if (!isPasswordValid) {
+      return { error: 'Current password is incorrect' }
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10)
+
+    // Update password
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { password: hashedPassword },
+    })
+
+    return { success: true, message: 'Password changed successfully' }
+  } catch (error) {
+    console.error('Password change error:', error)
     return { error: 'Something went wrong' }
   }
 }
