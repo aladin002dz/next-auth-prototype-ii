@@ -1,25 +1,25 @@
 import { prisma } from '@/prisma/prisma';
-import crypto from 'crypto';
 
 export async function createVerificationToken(email: string) {
-    const token = crypto.randomBytes(32).toString('hex');
-    const expires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+    // Generate a 6-digit code
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const expires = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
 
     await prisma.verificationToken.create({
         data: {
             identifier: email,
-            token,
+            token: code,
             expires,
         },
     });
 
-    return token;
+    return code;
 }
 
-export async function verifyToken(token: string) {
+export async function verifyToken(code: string) {
     const verificationToken = await prisma.verificationToken.findFirst({
         where: {
-            token,
+            token: code,
             expires: {
                 gt: new Date(),
             },

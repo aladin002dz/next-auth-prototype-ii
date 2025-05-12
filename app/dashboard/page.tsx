@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/prisma/prisma";
 import { redirect } from "next/navigation";
 import ChangePassword from "./components/ChangePassword";
+import EmailVerificationForm from "./components/EmailVerificationForm";
 import UpdateProfilePicture from "./components/UpdateProfilePicture";
 
 export default async function Dashboard() {
@@ -59,9 +60,7 @@ export default async function Dashboard() {
                         </svg>
                         Email Not Verified
                       </span>
-                      <p className="text-xs text-gray-500">
-                        Please check your email for a verification link
-                      </p>
+                      <EmailVerificationForm email={session.user.email!} />
                     </div>
                   )}
                 </div>

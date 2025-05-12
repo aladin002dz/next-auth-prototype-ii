@@ -217,3 +217,49 @@ export async function changePassword(currentPassword: string, newPassword: strin
     return { error: 'Something went wrong' }
   }
 }
+
+export async function verifyEmailCode(code: string) {
+  try {
+    if (!code) {
+      return { error: 'Verification code is required' };
+    }
+
+    const verificationToken = await prisma.verificationToken.findFirst({
+      where: {
+        token: code,
+        expires: {
+          gt: new Date(),
+        },
+      },
+    });
+
+    if (!verificationToken) {
+      return { error: 'Invalid or expired verification code' };
+    }
+
+    // Update user's email verification status
+    await prisma.user.update({
+      where: {
+        email: verificationToken.identifier,
+      },
+      data: {
+        emailVerified: new Date(),
+      },
+    });
+
+    // Delete the used token
+    await prisma.verificationToken.delete({
+      where: {
+        identifier_token: {
+          identifier: verificationToken.identifier,
+          token: verificationToken.token,
+        },
+      },
+    });
+
+    return { success: true, email: verificationToken.identifier };
+  } catch (error) {
+    console.error('Email verification error:', error);
+    return { error: 'An error occurred during verification' };
+  }
+}
