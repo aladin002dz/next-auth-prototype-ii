@@ -263,3 +263,22 @@ export async function verifyEmailCode(code: string) {
     return { error: 'An error occurred during verification' };
   }
 }
+
+export async function resendVerificationCode(email: string) {
+  try {
+    if (!email) {
+      return { error: 'Email is required' };
+    }
+
+    // Create new verification token
+    const code = await createVerificationToken(email);
+
+    // Send verification email
+    await sendVerificationEmail(email, code);
+
+    return { success: true };
+  } catch (error) {
+    console.error('Error resending verification code:', error);
+    return { error: 'Failed to send verification code' };
+  }
+}

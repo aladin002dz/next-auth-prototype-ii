@@ -1,8 +1,6 @@
 'use client';
 
-import { verifyEmailCode } from '@/actions/auth';
-import { sendVerificationEmail } from '@/actions/email';
-import { createVerificationToken } from '@/lib/verification-token';
+import { resendVerificationCode, verifyEmailCode } from '@/actions/auth';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -46,9 +44,12 @@ export default function EmailVerificationForm({ email }: EmailVerificationFormPr
         setSuccess('');
 
         try {
-            const newCode = await createVerificationToken(email);
-            await sendVerificationEmail(email, newCode);
-            setSuccess('A new verification code has been sent to your email');
+            const result = await resendVerificationCode(email);
+            if (result.success) {
+                setSuccess('A new verification code has been sent to your email');
+            } else {
+                setError(result.error || 'Failed to send new verification code');
+            }
         } catch (err: unknown) {
             console.error('Error resending code:', err);
             setError('Failed to send new verification code');
